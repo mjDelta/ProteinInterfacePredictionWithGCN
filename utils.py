@@ -14,9 +14,9 @@ def gen_adj_matrix(vertex,hood_indices,edge):
 	for i,indices in enumerate(hood_indices):
 		adj_distance[i,indices]=edge[i,:,0:1]
 		adj_angle[i,indices]=edge[i,:,1:2]
-	#make it symmetric
-	adj_distance=adj_distance+np.multiply(adj_distance.T,(adj_distance.T>adj_distance))-np.multiply(adj_distance,(adj_distance.T>adj_distance))
-	adj_angle=adj_angle+np.multiply(adj_angle.T,(adj_angle.T>adj_angle))-np.multiply(adj_angle,(adj_angle.T>adj_angle))
+	# #make it symmetric
+	# adj_distance=adj_distance+np.multiply(adj_distance.T,(adj_distance.T>adj_distance))-np.multiply(adj_distance,(adj_distance.T>adj_distance))
+	# adj_angle=adj_angle+np.multiply(adj_angle.T,(adj_angle.T>adj_angle))-np.multiply(adj_angle,(adj_angle.T>adj_angle))
 	#normalization
 	adj_distance=normalize(adj_distance+np.eye(adj_distance.shape[0]))
 	adj_angle=normalize(adj_angle+np.eye(adj_angle.shape[0]))
