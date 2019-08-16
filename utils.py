@@ -8,11 +8,11 @@ from six.moves import cPickle
 import numpy as np
 import scipy.sparse as sp
 
-def gen_adj_matrix(vertex,hood_indices,edge):
+def gen_adj_matrix(vertex,hood_indices,edge,sigma=1):
 	adj_distance=np.zeros(shape=(len(vertex),len(vertex)))
 	adj_angle=np.zeros(shape=(len(vertex),len(vertex)))
 	for i,indices in enumerate(hood_indices):
-		adj_distance[i,indices]=edge[i,:,0:1]
+		adj_distance[i,indices]=np.exp(-edge[i,:,0:1]*edge[i,:,0:1]/(2*sigma*sigma))
 		adj_angle[i,indices]=edge[i,:,1:2]
 	# #make it symmetric
 	# adj_distance=adj_distance+np.multiply(adj_distance.T,(adj_distance.T>adj_distance))-np.multiply(adj_distance,(adj_distance.T>adj_distance))
