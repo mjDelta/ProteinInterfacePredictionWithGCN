@@ -22,6 +22,9 @@ def gen_adj_matrix(vertex,hood_indices,edge):
 	adj_angle=normalize(adj_angle+np.eye(adj_angle.shape[0]))
 	return adj_distance,adj_angle
 def normalize(matrix):
+	"""
+	A/D
+	"""
 	rowsum=matrix.sum(axis=1)
 	r_inv=np.power(rowsum,-1).flatten()
 	r_inv[np.isinf(r_inv)]=0
@@ -67,12 +70,14 @@ def load_data(path):
 		data["receptor_indices"]=label[:,1]
 		labels=to_onehot(label[:,2])
 		data["label"]=labels
+		data["complex_code"]=complex_code
 		graphs.append(data)
 		# if len(graphs)==2:break
 	return graphs
 def compute_accuracy(preds,trues):
-	preds_=np.argmax(preds)
-	trues_=np.argmax(trues)
+
+	preds_=np.argmax(preds,axis=1)
+	trues_=np.argmax(trues,axis=1)
 	cnts=np.sum(preds_==trues_)
 	return cnts/len(preds)
 
