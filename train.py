@@ -25,7 +25,7 @@ epochs=30000
 hidden_dim=100
 train_rate=0.8
 drop_prob=0.5
-lr=0.0001
+lr=0.01
 weight_decay=5e-4
 batch_size=1024
 best_loss=9999
@@ -53,6 +53,7 @@ for e in range(epochs):
 		l_indices=g["ligand_indices"]
 		r_indices=g["receptor_indices"]
 		labels=g["label"]
+		weights=g["weights"]
 
 		label_size=len(labels)
 		iters=math.ceil(label_size/batch_size)
@@ -61,7 +62,7 @@ for e in range(epochs):
 		r_vertex=r_graph["vertex"];r_adj_distance=r_graph["adj_distance"];r_adj_angle=r_graph["adj_angle"]
 
 
-
+		weights=torch.FloatTensor(weights)
 		labels=torch.FloatTensor(labels).to(device)
 		l_vertex=torch.FloatTensor(l_vertex).to(device)
 		l_adj_distance=torch.FloatTensor(l_adj_distance).to(device)
@@ -80,6 +81,7 @@ for e in range(epochs):
 			end=start+batch_size
 			if end>label_size:end=label_size
 			batch_preds=model(l_vertex,l_adj_distance,l_adj_angle,r_vertex,r_adj_distance,r_adj_angle,l_indices[start:end],r_indices[start:end])
+			criterion.weight=weights[start:end]
 			batch_loss=criterion(batch_preds,labels[start:end])
 
 			it_loss=batch_loss.item()

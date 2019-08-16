@@ -39,6 +39,14 @@ def to_onehot(labels):
 		else:
 			onehots[i,0]=1
 	return onehots
+def gen_weights_for_BCELoss(w_positive,labels):
+	weights=[]
+	for i,l in enumerate(labels):
+		if l==1:
+			weights.append(w_positive)
+		else:
+			weights.append(1-w_positive)
+	return np.array(weights)
 def load_data(path):
 	with gzip.open(path,"rb") as f:
 		_,data=cPickle.load(f,encoding="latin1")
@@ -66,13 +74,19 @@ def load_data(path):
 		data={}
 		data["ligand"]=l_graph
 		data["receptor"]=r_graph
+		if "train" in path:
+			all_idxs=np.arange(len(label))
+			np.random.shuffle(all_idxs)
+			label=label[all_idxs,:]
 		data["ligand_indices"]=label[:,0]
 		data["receptor_indices"]=label[:,1]
 		labels=to_onehot(label[:,2])
 		data["label"]=labels
+		weight_positive=1-np.sum(label[:,2]==1)/len(label)
+		weights=gen_weights_for_BCELoss(weight_positive,label[:,2])
 		data["complex_code"]=complex_code
+		data["weights"]=weights
 		graphs.append(data)
-		# if len(graphs)==2:break
 	return graphs
 def compute_accuracy(preds,trues):
 

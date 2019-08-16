@@ -20,7 +20,7 @@ USE_CUDA=torch.cuda.is_available()
 device=torch.device("cuda" if USE_CUDA else "cpu")
 
 train_path="E:/proteins/train.cpkl.gz"
-load_model_path="E:/proteins/saved_models/model_1773.tar"
+load_model_path="E:/proteins/saved_models/model_94.tar"
 
 hidden_dim=100
 train_rate=0.8
@@ -67,7 +67,8 @@ for g in val_graphs:
 	acc=compute_accuracy(preds.detach().cpu().numpy(),labels)
 	print(np.argmax(preds.detach().cpu().numpy(),axis=1))
 	print(np.argmax(labels,axis=1))
+	print(g["weights"])
 	print("Protein:{} ACC:{}".format(g["complex_code"],acc))
-
+	break
 
 
