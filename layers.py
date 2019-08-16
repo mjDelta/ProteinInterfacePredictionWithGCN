@@ -28,10 +28,10 @@ class GC4Protein(Module):
 	def reset_parameters(self):
 		stdv=1/math.sqrt(self.weights_distance.size(1))
 		self.weights_angle.data.uniform_(-stdv,stdv)
-		self.bias_angle.data.uniform_(-stdv,stdv)
+		self.bias_angle.data.fill_(0)
 
 		self.weights_distance.data.uniform_(-stdv,stdv)
-		self.bias_distance.data.uniform_(-stdv,stdv)
+		self.bias_distance.data.fill_(0)
 
 	def forward(self,l_vertex,l_adj_distance,l_adj_angle,r_vertex,r_adj_distance,r_adj_angle):
 		l_support_distance=torch.mm(l_vertex,self.weights_distance)

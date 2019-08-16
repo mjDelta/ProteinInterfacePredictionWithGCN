@@ -25,7 +25,7 @@ epochs=30000
 hidden_dim=100
 train_rate=0.8
 drop_prob=0.5
-lr=0.01
+lr=0.0001
 weight_decay=5e-4
 batch_size=1024
 best_loss=9999
@@ -38,7 +38,7 @@ model=GCN4Protein(vertex_features_dim,hidden_dim,drop_prob)
 model.to(device)
 
 optimizer=optim.SGD(model.parameters(),lr=lr,weight_decay=weight_decay)
-criterion=nn.BCELoss(weight=torch.FloatTensor([1,9]).to(device))
+criterion=nn.BCELoss()
 
 iter_losses=[]
 train_losses=[]

@@ -19,13 +19,13 @@ def mkdirs(path):
 USE_CUDA=torch.cuda.is_available()
 device=torch.device("cuda" if USE_CUDA else "cpu")
 
-train_path="E:/proteins/train.cpkl.gz"
-load_model_path="E:/proteins/saved_models/model_35.tar"
+data_path="E:/proteins/test.cpkl.gz"
+load_model_path="E:/proteins/saved_models/model_66.tar"
 
 hidden_dim=100
 train_rate=0.8
 drop_prob=0.5
-graphs=load_data(train_path)
+graphs=load_data(data_path)
 vertex_features_dim=graphs[0]["ligand"]["vertex"].shape[1]
 
 train_graphs=graphs[:int(train_rate*len(graphs))]
@@ -67,8 +67,7 @@ for g in val_graphs:
 	acc=compute_accuracy(preds.detach().cpu().numpy(),labels)
 	print(np.argmax(preds.detach().cpu().numpy(),axis=1))
 	print(np.argmax(labels,axis=1))
-	print(g["weights"])
-	print("Protein:{} ACC:{}".format(g["complex_code"],acc))
+	print("Protein:{} ACC:{} Positive:{}".format(g["complex_code"],acc,np.sum(np.argmax(labels,axis=1))/len(labels)))
 	break
 
 

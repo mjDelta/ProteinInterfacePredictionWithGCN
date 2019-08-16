@@ -39,7 +39,18 @@ def to_onehot(labels):
 		else:
 			onehots[i,0]=1
 	return onehots
-
+def downsample(pairs):
+	negative_idxs=[]
+	positive_idxs=[]
+	for i,p in enumerate(pairs):
+		if p[-1]==-1:
+			negative_idxs.append(i)
+		else:
+			positive_idxs.append(i)
+	negative_idxs=np.array(negative_idxs)
+	selected_idxs=np.random.choice(negative_idxs,size=np.sum(pairs[:,-1]==1),replace=False)
+	all_idxs=[];all_idxs.extend(positive_idxs);all_idxs.extend(selected_idxs)
+	return np.array(pairs[all_idxs])
 def load_data(path):
 	with gzip.open(path,"rb") as f:
 		_,data=cPickle.load(f,encoding="latin1")
@@ -54,6 +65,9 @@ def load_data(path):
 		label=protein["label"]
 		r_hood_indices=protein["r_hood_indices"]
 		l_hood_indices=protein["l_hood_indices"]
+		# if "test" in path:
+		if 1:
+			label=downsample(label)
 
 		r_adj_distance,r_adj_angle=gen_adj_matrix(r_vertex,r_hood_indices,r_edge)
 		l_adj_distance,l_adj_angle=gen_adj_matrix(l_vertex,l_hood_indices,l_edge)
@@ -86,5 +100,5 @@ def compute_accuracy(preds,trues):
 	return cnts/len(preds)
 
 if __name__=="__main__":
-	graphs=load_data("E:/proteins/train.cpkl.gz")
+	graphs=load_data("E:/proteins/test.cpkl.gz")
 	print(len(graphs))
