@@ -38,7 +38,7 @@ model=GCN4Protein(vertex_features_dim,hidden_dim,drop_prob)
 model.to(device)
 
 optimizer=optim.SGD(model.parameters(),lr=lr,weight_decay=weight_decay)
-criterion=nn.BCELoss()
+criterion=nn.BCELoss(weight=torch.FloatTensor([1,9]).to(device))
 
 iter_losses=[]
 train_losses=[]
@@ -53,7 +53,6 @@ for e in range(epochs):
 		l_indices=g["ligand_indices"]
 		r_indices=g["receptor_indices"]
 		labels=g["label"]
-		weights=g["weights"]
 
 		label_size=len(labels)
 		iters=math.ceil(label_size/batch_size)
@@ -61,8 +60,6 @@ for e in range(epochs):
 		l_vertex=l_graph["vertex"];l_adj_distance=l_graph["adj_distance"];l_adj_angle=l_graph["adj_angle"]
 		r_vertex=r_graph["vertex"];r_adj_distance=r_graph["adj_distance"];r_adj_angle=r_graph["adj_angle"]
 
-
-		weights=torch.FloatTensor(weights)
 		labels=torch.FloatTensor(labels).to(device)
 		l_vertex=torch.FloatTensor(l_vertex).to(device)
 		l_adj_distance=torch.FloatTensor(l_adj_distance).to(device)
@@ -81,7 +78,7 @@ for e in range(epochs):
 			end=start+batch_size
 			if end>label_size:end=label_size
 			batch_preds=model(l_vertex,l_adj_distance,l_adj_angle,r_vertex,r_adj_distance,r_adj_angle,l_indices[start:end],r_indices[start:end])
-			criterion.weight=weights[start:end]
+			# criterion.weight=weights[start:end]
 			batch_loss=criterion(batch_preds,labels[start:end])
 
 			it_loss=batch_loss.item()
