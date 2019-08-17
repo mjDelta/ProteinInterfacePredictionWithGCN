@@ -82,4 +82,6 @@ for preds,ys in zip(all_preds,all_ys):
 	all_ys_arr[cnter:cnter+len(preds)]=ys
 	cnter+=len(preds)
 auc=roc_auc_score(all_ys_arr,all_preds_arr)
+print(all_ys_arr)
+print(all_preds_arr)
 print("AUC:{}\t ACC:{}".format(auc,np.array(val_accs).mean()))
