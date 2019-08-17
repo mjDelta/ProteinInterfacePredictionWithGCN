@@ -11,6 +11,7 @@ from torch import optim
 import torch
 import math
 import numpy as np
+from sklearn.metrics import roc_auc_score
 def mkdirs(path):
 	if not os.path.exists(path):
 		os.makedirs(path)
@@ -20,10 +21,10 @@ USE_CUDA=torch.cuda.is_available()
 device=torch.device("cuda" if USE_CUDA else "cpu")
 
 data_path="E:/proteins/test.cpkl.gz"
-load_model_path="E:/proteins/saved_models/model_3176.tar"
+load_model_path="E:/proteins/saved_models190817/model_519.tar"
 
 hidden_dim=100
-train_rate=0.8
+train_rate=0.
 drop_prob=0.5
 graphs=load_data(data_path)
 vertex_features_dim=graphs[0]["ligand"]["vertex"].shape[1]
@@ -36,11 +37,12 @@ model.load_state_dict(model_sd["model"])
 model.to(device)
 model.eval()
 
-iter_losses=[]
-train_losses=[]
-val_losses=[]
+
 val_accs=[]
 
+all_preds=[]
+all_ys=[]
+length=0
 for g in val_graphs:
 
 	l_graph=g["ligand"]
@@ -65,9 +67,19 @@ for g in val_graphs:
 
 	preds=model(l_vertex,l_adj_distance,l_adj_angle,r_vertex,r_adj_distance,r_adj_angle,l_indices,r_indices)
 	acc=compute_accuracy(preds.detach().cpu().numpy(),labels)
-	print(np.argmax(preds.detach().cpu().numpy(),axis=1))
-	print(np.argmax(labels,axis=1))
+	all_preds.append(preds.detach().cpu().numpy())
+	all_ys.append(labels)
+	val_accs.append(acc)
+	length+=len(labels)
 	print("Protein:{} ACC:{} Positive:{}".format(g["complex_code"],acc,np.sum(np.argmax(labels,axis=1))/len(labels)))
-	break
+	# break
 
-
+all_preds_arr=np.zeros(shape=(length,2))
+all_ys_arr=np.zeros(shape=(length,2))
+cnter=0
+for preds,ys in zip(all_preds,all_ys):
+	all_preds_arr[cnter:cnter+len(preds)]=preds
+	all_ys_arr[cnter:cnter+len(preds)]=ys
+	cnter+=len(preds)
+auc=roc_auc_score(all_ys_arr,all_preds_arr)
+print("AUC:{}\t ACC:{}".format(auc,np.array(val_accs).mean()))
