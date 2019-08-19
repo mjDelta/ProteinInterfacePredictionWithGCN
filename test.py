@@ -5,7 +5,7 @@
 
 import os
 from utils import load_data,compute_accuracy
-from models import GCN4Protein
+from models import GCN4Protein,GCN4ProteinV2
 from torch import nn
 from torch import optim
 import torch
@@ -21,7 +21,7 @@ USE_CUDA=torch.cuda.is_available()
 device=torch.device("cuda" if USE_CUDA else "cpu")
 
 data_path="E:/proteins/test.cpkl.gz"
-load_model_path="E:/proteins/saved_models190817/model_519.tar"
+load_model_path="E:/proteins/saved_models/model_23.tar"
 
 hidden_dim=100
 train_rate=0.
@@ -31,11 +31,12 @@ vertex_features_dim=graphs[0]["ligand"]["vertex"].shape[1]
 
 train_graphs=graphs[:int(train_rate*len(graphs))]
 val_graphs=graphs[int(train_rate*len(graphs)):]
-model=GCN4Protein(vertex_features_dim,hidden_dim,drop_prob)
+# model=GCN4Protein(vertex_features_dim,hidden_dim,drop_prob)
+model=GCN4ProteinV2(vertex_features_dim,hidden_dim,drop_prob)
 model_sd=torch.load(load_model_path)
 model.load_state_dict(model_sd["model"])
 model.to(device)
-model.eval()
+
 
 
 val_accs=[]
@@ -64,7 +65,7 @@ for g in val_graphs:
 	r_indices=torch.FloatTensor(r_indices).to(device)
 	l_indices=l_indices.to(torch.int64)
 	r_indices=r_indices.to(torch.int64)
-
+	model.eval()
 	preds=model(l_vertex,l_adj_distance,l_adj_angle,r_vertex,r_adj_distance,r_adj_angle,l_indices,r_indices)
 	acc=compute_accuracy(preds.detach().cpu().numpy(),labels)
 	all_preds.append(preds.detach().cpu().numpy())
@@ -72,14 +73,14 @@ for g in val_graphs:
 	val_accs.append(acc)
 	length+=len(labels)
 	print("Protein:{} ACC:{} Positive:{}".format(g["complex_code"],acc,np.sum(np.argmax(labels,axis=1))/len(labels)))
-	# break
+	break
 
-all_preds_arr=np.zeros(shape=(length,2))
-all_ys_arr=np.zeros(shape=(length,2))
+all_preds_arr=np.zeros(shape=(length,))
+all_ys_arr=np.zeros(shape=(length,))
 cnter=0
 for preds,ys in zip(all_preds,all_ys):
-	all_preds_arr[cnter:cnter+len(preds)]=preds
-	all_ys_arr[cnter:cnter+len(preds)]=ys
+	all_preds_arr[cnter:cnter+len(preds)]=preds[:,1]
+	all_ys_arr[cnter:cnter+len(preds)]=ys[:,1]
 	cnter+=len(preds)
 auc=roc_auc_score(all_ys_arr,all_preds_arr)
 print(all_ys_arr)

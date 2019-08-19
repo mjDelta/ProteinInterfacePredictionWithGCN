@@ -5,7 +5,7 @@
 
 import os
 from utils import load_data,compute_accuracy
-from models import GCN4Protein
+from models import GCN4Protein,GCN4ProteinV2
 from torch import nn
 from torch import optim
 import torch
@@ -34,7 +34,8 @@ vertex_features_dim=graphs[0]["ligand"]["vertex"].shape[1]
 
 train_graphs=graphs[:int(train_rate*len(graphs))]
 val_graphs=graphs[int(train_rate*len(graphs)):]
-model=GCN4Protein(vertex_features_dim,hidden_dim,drop_prob)
+# model=GCN4Protein(vertex_features_dim,hidden_dim,drop_prob)
+model=GCN4ProteinV2(vertex_features_dim,hidden_dim,drop_prob)
 model.to(device)
 
 optimizer=optim.SGD(model.parameters(),lr=lr,weight_decay=weight_decay)
