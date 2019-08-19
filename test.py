@@ -21,7 +21,7 @@ USE_CUDA=torch.cuda.is_available()
 device=torch.device("cuda" if USE_CUDA else "cpu")
 
 data_path="E:/proteins/test.cpkl.gz"
-load_model_path="E:/proteins/saved_models/model_130.tar"
+load_model_path="E:/proteins/saved_models_dim50/model_130.tar"
 
 hidden_dim=50
 train_rate=0.
@@ -73,7 +73,7 @@ for g in val_graphs:
 	val_accs.append(acc)
 	length+=len(labels)
 	print("Protein:{} ACC:{} Positive:{}".format(g["complex_code"],acc,np.sum(np.argmax(labels,axis=1))/len(labels)))
-	break
+	# break
 
 all_preds_arr=np.zeros(shape=(length,))
 all_ys_arr=np.zeros(shape=(length,))
@@ -83,6 +83,6 @@ for preds,ys in zip(all_preds,all_ys):
 	all_ys_arr[cnter:cnter+len(preds)]=ys[:,1]
 	cnter+=len(preds)
 auc=roc_auc_score(all_ys_arr,all_preds_arr)
-print(all_ys_arr)
-print(all_preds_arr)
+# print(all_ys_arr)
+# print(all_preds_arr)
 print("AUC:{}\t ACC:{}".format(auc,np.array(val_accs).mean()))

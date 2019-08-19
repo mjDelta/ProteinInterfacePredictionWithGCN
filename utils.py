@@ -101,4 +101,4 @@ def compute_accuracy(preds,trues):
 
 if __name__=="__main__":
 	graphs=load_data("E:/proteins/test.cpkl.gz")
-	print(len(graphs))
+	print(graphs[0]["ligand"]["vertex"].shape)
