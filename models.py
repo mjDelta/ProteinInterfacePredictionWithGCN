@@ -56,6 +56,12 @@ class GCN4ProteinV2(nn.Module):
 	def __init__(self,in_feature_dim,hid_dim,drop_prob):
 		super(GCN4ProteinV2,self).__init__()
 
+		self.pre_adj=nn.Sequential(
+			nn.Conv1d(2,hid_dim,1),
+			nn.BatchNorm1d(hid_dim),
+			nn.LeakyReLU())
+
+
 		self.gc1=GCLayer(in_feature_dim,hid_dim)
 		self.gc2=GCLayer(hid_dim,hid_dim)
 
@@ -68,15 +74,21 @@ class GCN4ProteinV2(nn.Module):
 			nn.Sigmoid())
 		self.drop_prob=drop_prob
 	def forward(self,l_vertex,l_adj_distance,l_adj_angle,r_vertex,r_adj_distance,r_adj_angle,ligands,receptors):
+		l_adj=torch.stack([l_adj_distance,l_adj_angle],dim=1)
+		l_adj=self.pre_adj(l_adj)
+		l_adj=torch.mean(l_adj,dim=1)
 
-
-		l_gc1=F.dropout(F.relu(self.gc1(l_vertex,l_adj_distance,l_adj_angle)),self.drop_prob)
-		l_gc2=F.dropout(F.relu(self.gc2(l_gc1,l_adj_distance,l_adj_angle)),self.drop_prob)
+		l_gc1=F.dropout(F.relu(self.gc1(l_vertex,l_adj)),self.drop_prob)
+		l_gc2=F.dropout(F.relu(self.gc2(l_gc1,l_adj)),self.drop_prob)
 
 		l_embs=l_gc2[ligands]
 
-		r_gc1=F.dropout(F.relu(self.gc1(r_vertex,r_adj_distance,r_adj_angle)),self.drop_prob)
-		r_gc2=F.dropout(F.relu(self.gc2(r_gc1,r_adj_distance,r_adj_angle)),self.drop_prob)
+		r_adj=torch.stack([r_adj_distance,r_adj_angle],dim=1)
+		r_adj=self.pre_adj(r_adj)
+		r_adj=torch.mean(r_adj,dim=1)
+
+		r_gc1=F.dropout(F.relu(self.gc1(r_vertex,r_adj)),self.drop_prob)
+		r_gc2=F.dropout(F.relu(self.gc2(r_gc1,r_adj)),self.drop_prob)
 
 		r_embs=r_gc2[receptors]
 

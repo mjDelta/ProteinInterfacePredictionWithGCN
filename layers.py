@@ -22,11 +22,9 @@ class GCLayer(Module):
 		stdv=1./math.sqrt(self.weights.size(1))
 		self.weights.data.uniform_(-stdv,stdv)
 		self.bias.data.fill_(0)
-	def forward(self,vertex,adj_distance,adj_angle):
+	def forward(self,vertex,adj):
 		support=torch.mm(vertex,self.weights)
-		out_distance=torch.spmm(adj_distance,support)
-		out_angle=torch.spmm(adj_angle,support)
-		out=torch.add(out_distance,out_angle)
+		out=torch.spmm(adj,support)
 		out+=self.bias
 		return out
 class GC4Protein(Module):
