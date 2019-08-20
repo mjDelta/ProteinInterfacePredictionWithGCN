@@ -63,7 +63,8 @@ class GCN4ProteinV2(nn.Module):
 
 
 		self.gc1=GCLayer(in_feature_dim,hid_dim)
-		self.gc2=GCLayer(hid_dim,hid_dim)
+		# self.gc2=GCLayer(hid_dim,hid_dim)
+		# self.gc3=GCLayer(hid_dim,hid_dim)
 
 		self.fc1=nn.Sequential(
 			nn.Linear(2*hid_dim,hid_dim),
@@ -79,18 +80,20 @@ class GCN4ProteinV2(nn.Module):
 		l_adj=torch.mean(l_adj,dim=1)
 
 		l_gc1=F.dropout(F.relu(self.gc1(l_vertex,l_adj)),self.drop_prob)
-		l_gc2=F.dropout(F.relu(self.gc2(l_gc1,l_adj)),self.drop_prob)
+		# l_gc2=F.dropout(F.relu(self.gc2(l_gc1,l_adj)),self.drop_prob)
+		# l_gc3=F.dropout(F.relu(self.gc2(l_gc2,l_adj)),self.drop_prob)
 
-		l_embs=l_gc2[ligands]
+		l_embs=l_gc1[ligands]
 
 		r_adj=torch.stack([r_adj_distance,r_adj_angle],dim=1)
 		r_adj=self.pre_adj(r_adj)
 		r_adj=torch.mean(r_adj,dim=1)
 
 		r_gc1=F.dropout(F.relu(self.gc1(r_vertex,r_adj)),self.drop_prob)
-		r_gc2=F.dropout(F.relu(self.gc2(r_gc1,r_adj)),self.drop_prob)
+		# r_gc2=F.dropout(F.relu(self.gc2(r_gc1,r_adj)),self.drop_prob)
+		# r_gc3=F.dropout(F.relu(self.gc2(r_gc2,r_adj)),self.drop_prob)
 
-		r_embs=r_gc2[receptors]
+		r_embs=r_gc1[receptors]
 
 		embs=torch.cat([l_embs,r_embs],dim=1)
 		fc1=self.fc1(embs)
