@@ -23,7 +23,7 @@ device=torch.device("cuda" if USE_CUDA else "cpu")
 data_path="E:/proteins/test.cpkl.gz"
 load_model_path="E:/proteins/saved_models/model_137.tar"
 
-hidden_dim=50
+hidden_dim=35
 train_rate=0.
 drop_prob=0.5
 graphs=load_data(data_path)
