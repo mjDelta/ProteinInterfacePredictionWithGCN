@@ -21,9 +21,9 @@ USE_CUDA=torch.cuda.is_available()
 device=torch.device("cuda" if USE_CUDA else "cpu")
 
 data_path="E:/proteins/test.cpkl.gz"
-load_model_path="E:/proteins/saved_models_dim50_rgcn_layer1/model_143.tar"
+load_model_path="E:/proteins/saved_models_dim100_rgcn_layer1/model_138.tar"
 
-hidden_dim=50
+hidden_dim=100
 train_rate=0.
 drop_prob=0.5
 graphs=load_data(data_path)
