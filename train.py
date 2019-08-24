@@ -23,9 +23,9 @@ USE_CUDA=torch.cuda.is_available()
 device=torch.device("cuda" if USE_CUDA else "cpu")
 
 train_path="E:/proteins/train.cpkl.gz"
-saved_models="E:/proteins/saved_models_dim50_rgcn";mkdirs(saved_models)
+saved_models="E:/proteins/saved_models_dim100_rgcn_layer1";mkdirs(saved_models)
 epochs=200
-hidden_dim=50
+hidden_dim=100
 train_rate=0.8
 drop_prob=0.5
 lr=0.1
