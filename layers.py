@@ -7,7 +7,7 @@ import torch
 from torch.nn.parameter import Parameter
 from torch.nn.modules.module import Module
 import math
-
+from torch import nn
 class GCLayer(Module):
 	def __init__(self,in_features,out_features):
 		super(GCLayer,self).__init__()
@@ -25,6 +25,27 @@ class GCLayer(Module):
 	def forward(self,vertex,adj):
 		support=torch.mm(vertex,self.weights)
 		out=torch.spmm(adj,support)
+		out+=self.bias
+		return out
+class RGCLayer(Module):
+	def __init__(self,in_dim,h_dim,adj_nums):
+		super(RGCLayer,self).__init__()
+		self.weights=Parameter(torch.FloatTensor(adj_nums*in_dim,h_dim))
+		self.bias=Parameter(torch.FloatTensor(h_dim))
+		self.reset_parameters()
+
+	def reset_parameters(self):
+		nn.init.xavier_uniform_(self.weights)
+		self.bias.data.fill_(0)
+
+	def forward(self,features,A):
+		supports=[]
+		for adj in A:
+			supports.append(torch.mm(adj,features))
+		supports=torch.cat(supports,dim=1)
+
+		out=torch.mm(supports,self.weights)
+
 		out+=self.bias
 		return out
 class GC4Protein(Module):

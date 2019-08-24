@@ -5,7 +5,7 @@
 
 import os
 from utils import load_data,compute_accuracy
-from models import GCN4Protein,GCN4ProteinV2
+from models import GCN4Protein,GCN4ProteinV2,GCN4ProteinV3
 from torch import nn
 from torch import optim
 import torch
@@ -21,9 +21,9 @@ USE_CUDA=torch.cuda.is_available()
 device=torch.device("cuda" if USE_CUDA else "cpu")
 
 data_path="E:/proteins/test.cpkl.gz"
-load_model_path="E:/proteins/saved_models/model_134.tar"
+load_model_path="E:/proteins/saved_models/model_68.tar"
 
-hidden_dim=50
+hidden_dim=100
 train_rate=0.
 drop_prob=0.5
 graphs=load_data(data_path)
@@ -32,7 +32,8 @@ vertex_features_dim=graphs[0]["ligand"]["vertex"].shape[1]
 train_graphs=graphs[:int(train_rate*len(graphs))]
 val_graphs=graphs[int(train_rate*len(graphs)):]
 # model=GCN4Protein(vertex_features_dim,hidden_dim,drop_prob)
-model=GCN4ProteinV2(vertex_features_dim,hidden_dim,drop_prob)
+# model=GCN4ProteinV2(vertex_features_dim,hidden_dim,drop_prob)
+model=GCN4ProteinV3(vertex_features_dim,hidden_dim,drop_prob)
 model_sd=torch.load(load_model_path)
 model.load_state_dict(model_sd["model"])
 model.to(device)

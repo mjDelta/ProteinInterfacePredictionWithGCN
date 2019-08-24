@@ -5,7 +5,7 @@
 
 import torch.nn as nn
 import torch.nn.functional as F
-from layers import GC4Protein,GCLayer
+from layers import GC4Protein,GCLayer,RGCLayer
 import torch
 
 class GCN4Protein(nn.Module):
@@ -99,6 +99,45 @@ class GCN4ProteinV2(nn.Module):
 		fc1=self.fc1(embs)
 		out=self.fc2(fc1)
 		return out
+
+class GCN4ProteinV3(nn.Module):
+	"""docstring for GCN4ProteinV3"""
+	def __init__(self, in_dim,h_dim,drop_prob):
+		super(GCN4ProteinV3, self).__init__()
+		self.drop_prob=drop_prob
+
+		self.gc1=RGCLayer(in_dim,h_dim,2)
+		self.gc2=RGCLayer(h_dim,h_dim,2)
+
+		self.fc1=nn.Sequential(
+			nn.Linear(2*h_dim,h_dim),
+			nn.ReLU(),
+			nn.Dropout(drop_prob))
+		self.fc2=nn.Sequential(
+			nn.Linear(h_dim,2),
+			nn.Sigmoid())
+	def forward(self,l_vertex,l_adj_distance,l_adj_angle,r_vertex,r_adj_distance,r_adj_angle,ligands,receptors):
+		l_adj=[l_adj_distance,l_adj_angle]
+		l_gc1=F.dropout(F.relu(self.gc1(l_vertex,l_adj)),self.drop_prob)
+		l_gc2=F.dropout(F.relu(self.gc2(l_gc1,l_adj)),self.drop_prob)
+
+		l_embs=l_gc2[ligands]
+
+		r_adj=[r_adj_distance,r_adj_angle]
+		r_gc1=F.dropout(F.relu(self.gc1(r_vertex,r_adj)),self.drop_prob)
+		r_gc2=F.dropout(F.relu(self.gc2(r_gc1,r_adj)),self.drop_prob)
+
+		r_embs=r_gc2[receptors]
+
+		embs=torch.cat([l_embs,r_embs],dim=1)
+
+		# print(embs)
+
+		fc1=self.fc1(embs)
+		fc2=self.fc2(fc1)
+		return fc2
+
+
 
 
 

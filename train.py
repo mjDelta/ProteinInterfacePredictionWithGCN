@@ -5,7 +5,7 @@
 
 import os
 from utils import load_data,compute_accuracy
-from models import GCN4Protein,GCN4ProteinV2
+from models import GCN4Protein,GCN4ProteinV2,GCN4ProteinV3
 from torch import nn
 from torch import optim
 import torch
@@ -25,7 +25,7 @@ device=torch.device("cuda" if USE_CUDA else "cpu")
 train_path="E:/proteins/train.cpkl.gz"
 saved_models="E:/proteins/saved_models";mkdirs(saved_models)
 epochs=200
-hidden_dim=50
+hidden_dim=100
 train_rate=0.8
 drop_prob=0.5
 lr=0.1
@@ -38,7 +38,8 @@ vertex_features_dim=graphs[0]["ligand"]["vertex"].shape[1]
 train_graphs=graphs[:int(train_rate*len(graphs))]
 val_graphs=graphs[int(train_rate*len(graphs)):]
 # model=GCN4Protein(vertex_features_dim,hidden_dim,drop_prob)
-model=GCN4ProteinV2(vertex_features_dim,hidden_dim,drop_prob)
+# model=GCN4ProteinV2(vertex_features_dim,hidden_dim,drop_prob)
+model=GCN4ProteinV3(vertex_features_dim,hidden_dim,drop_prob)
 model.to(device)
 
 optimizer=optim.SGD(model.parameters(),lr=lr,weight_decay=weight_decay)
@@ -89,6 +90,12 @@ for e in range(epochs):
 			if end>label_size:end=label_size
 			batch_preds=model(l_vertex,l_adj_distance,l_adj_angle,r_vertex,r_adj_distance,r_adj_angle,l_indices[start:end],r_indices[start:end])
 			# criterion.weight=weights[start:end]
+
+			# batch_preds[batch_preds<0.]=0
+			# batch_preds[batch_preds>1.]=1.
+			# print(batch_preds)
+			# print(batch_preds.max(),batch_preds.min())
+			# print(labels[start:end].max(),labels[start:end].min())
 			batch_loss=criterion(batch_preds,labels[start:end])
 
 			it_loss=batch_loss.item()
