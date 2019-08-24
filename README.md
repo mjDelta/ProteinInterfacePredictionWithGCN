@@ -5,8 +5,9 @@ This repo recorded applying graph convolutional operation (defined by Kipf et al
 * The dim confict in equations, [n,n] and [n,n,2].
 And we proposed to solved it by adding a convolutional operation before graph convolution.
 ### Results
-Graph convolution networks, defined as below:
-[GCN](https://latex.codecogs.com/gif.latex?Z%3Df%28X%2CA%29%3Dsoftmax%28%5Cwidehat%7BA%7D%20ReLU%28%5Cwidehat%20%7BA%7DX%5E%7B%280%29%7DW%5E%7B%280%29%7D%29W%5E%7B%281%29%7D%29)
+Graph convolution networks, defined as below:</br>
+<a href="https://www.codecogs.com/eqnedit.php?latex=Z=f(X,A)=sigmoid(\widehat{A}XW^{(0)})" target="_blank"><img src="https://latex.codecogs.com/gif.latex?Z=f(X,A)=sigmoid(\widehat{A}XW^{(0)})" title="Z=f(X,A)=sigmoid(\widehat{A}XW^{(0)})" /></a>
+
 | hidden_dim | GC layer number | auc | acc |
 | :--: | :--: | :--: | :--: |
 | 50 | 2 | 0.75 | 0.69 |
@@ -14,5 +15,14 @@ Graph convolution networks, defined as below:
 | 128 | 2 | 0.74 | 0.68 |
 | 50 | 1 | 0.77 | 0.70 |
 
-Relation graph convolution networks, defined as below:
+Relation graph convolution networks, defined as below:</br>
+<a href="https://www.codecogs.com/eqnedit.php?latex=Z=f(X,A)=sigmoid((\sum_{r\subseteq{R}}&space;{\widehat{A}_{r}X})W^{(0)})" target="_blank"><img src="https://latex.codecogs.com/gif.latex?Z=f(X,A)=sigmoid((\sum_{r\subseteq{R}}&space;{\widehat{A}_{r}X})W^{(0)})" title="Z=f(X,A)=sigmoid((\sum_{r\subseteq{R}} {\widehat{A}_{r}X})W^{(0)})" /></a>
 
+| hidden_dim | GC layer number | auc | acc |
+| :--: | :--: | :--: | :--: |
+| 50 | 2 | 0.67 | 0.64 |
+| 100 | 2 | 0.73 | 0.66 |
+| 200 | 2 | 0.72 | 0.66 |
+| 50 | 1 | 0.75 | 0.68 |
+| 100 | 1 | 0.75 | 0.68 |
+| 200 | 1 | 0.76 | 0.69 |
